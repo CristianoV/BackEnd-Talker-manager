@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const crypto = require('crypto');
+const { validadeEmail, validadePassword } = require('./validateLogin');
 
 const app = express();
 app.use(bodyParser.json());
@@ -37,17 +38,9 @@ app.get('/talker/:id', (_request, response) => {
   return response.status(HTTP_OK_STATUS).json(talkerFindId);
 });
 
-app.post('/login', (_request, response) => {
-  const { email, password } = _request.body;
-  const re = /^\w+(\[\+\.-\]?\w)*@\w+(\[\.-\]?\w+)*\.[a-z]+$/i;
+app.post('/login', validadeEmail, validadePassword, (_request, response) => {
   const token = crypto.randomBytes(8).toString('hex');
-
-  if (email && re.test(email) && password) {
-    return response.status(HTTP_OK_STATUS).json({ token });
-  }
-  return response.status(HTTP_BAD_REQUEST_STATUS).send({
-    message: 'Preencha todos os campos',
-  });
+  return response.status(HTTP_OK_STATUS).json({ token });
 });
 
 app.listen(PORT, () => {
