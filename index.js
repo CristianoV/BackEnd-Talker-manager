@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const crypto = require('crypto');
 const { validadeEmail, validadePassword } = require('./validateLogin');
+const { validadeToken, validadeName } = require('./validadeTalkerPost');
 
 const app = express();
 app.use(bodyParser.json());
@@ -36,6 +37,16 @@ app.get('/talker/:id', (_request, response) => {
     });
   }
   return response.status(HTTP_OK_STATUS).json(talkerFindId);
+});
+
+app.post('/talker', validadeToken, validadeName, (_request, response) => {
+  const { name, age, talk } = _request.body;
+  const allTalkers = talkers();
+  const newTalkers = [...allTalkers, { name, age, talk }];
+  fs.writeFileSync('talker.json', JSON.stringify(newTalkers));
+  return response.status(HTTP_OK_STATUS).json({
+    message: 'Pessoa palestrante cadastrada com sucesso',
+  });
 });
 
 app.post('/login', validadeEmail, validadePassword, (_request, response) => {
