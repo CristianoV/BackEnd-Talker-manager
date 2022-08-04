@@ -11,6 +11,7 @@ app.use(bodyParser.json());
 
 const HTTP_OK_STATUS = 200;
 const HTTP_GOD_STATUS = 201;
+const HTTP_VERY_GOD_STATUS = 204;
 const HTTP_BAD_REQUEST_STATUS = 404;
 const PORT = '3000';
 const talkers = () => JSON.parse(fs.readFileSync('talker.json', 'utf8'));
@@ -60,11 +61,19 @@ validadeAge, validadeTalk, validadeRate, validadeDate, (_request, response) => {
   const numberId = Number(id);
   const allTalkers = talkers();
   const talkerFindId = allTalkers.findIndex((talkerId) => talkerId.id === Number(id));
-  console.log(talkerFindId);
    allTalkers[talkerFindId] = { name, age, id: numberId, talk };
   fs.writeFileSync('talker.json', JSON.stringify(allTalkers));
 
   return response.status(HTTP_OK_STATUS).json({ name, age, id: numberId, talk });
+});
+
+app.delete('/talker/:id', validadeToken, (_request, response) => {
+  const { id } = _request.params;
+  const allTalkers = talkers();
+  const talkerFindId = allTalkers.filter((talkerId) => talkerId.id !== Number(id));
+  fs.writeFileSync('talker.json', JSON.stringify(talkerFindId));
+
+  return response.status(HTTP_VERY_GOD_STATUS).json();
 });
 
 app.post('/login', validadeEmail, validadePassword, (_request, response) => {
