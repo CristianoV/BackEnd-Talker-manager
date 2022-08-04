@@ -48,10 +48,23 @@ validadeTalk, validadeRate, validadeDate, (_request, response) => {
   const allTalkers = talkers();
   const newTalkers = [...allTalkers, { name, age, id: allTalkers.length + 1, talk }];
   fs.writeFileSync('talker.json', JSON.stringify(newTalkers));
-  console.log({ name, age, id: allTalkers.length + 1, talk });
   return response.status(HTTP_GOD_STATUS).json(
     { name, age, id: allTalkers.length + 1, talk },
   );
+});
+
+app.put('/talker/:id', validadeToken, validadeName,
+validadeAge, validadeTalk, validadeRate, validadeDate, (_request, response) => {
+  const { id } = _request.params;
+  const { name, age, talk } = _request.body;
+  const numberId = Number(id);
+  const allTalkers = talkers();
+  const talkerFindId = allTalkers.findIndex((talkerId) => talkerId.id === Number(id));
+  console.log(talkerFindId);
+   allTalkers[talkerFindId] = { name, age, id: numberId, talk };
+  fs.writeFileSync('talker.json', JSON.stringify(allTalkers));
+
+  return response.status(HTTP_OK_STATUS).json({ name, age, id: numberId, talk });
 });
 
 app.post('/login', validadeEmail, validadePassword, (_request, response) => {
