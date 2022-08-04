@@ -3,12 +3,14 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const crypto = require('crypto');
 const { validadeEmail, validadePassword } = require('./validateLogin');
-const { validadeToken, validadeName } = require('./validadeTalkerPost');
+const { validadeToken, validadeName, validadeAge, validadeTalk,
+  validadeDate, validadeRate } = require('./validadeTalkerPost');
 
 const app = express();
 app.use(bodyParser.json());
 
 const HTTP_OK_STATUS = 200;
+const HTTP_GOD_STATUS = 201;
 const HTTP_BAD_REQUEST_STATUS = 404;
 const PORT = '3000';
 const talkers = () => JSON.parse(fs.readFileSync('talker.json', 'utf8'));
@@ -39,14 +41,17 @@ app.get('/talker/:id', (_request, response) => {
   return response.status(HTTP_OK_STATUS).json(talkerFindId);
 });
 
-app.post('/talker', validadeToken, validadeName, (_request, response) => {
+app.post('/talker',
+validadeToken, validadeName, validadeAge,
+validadeTalk, validadeRate, validadeDate, (_request, response) => {
   const { name, age, talk } = _request.body;
   const allTalkers = talkers();
-  const newTalkers = [...allTalkers, { name, age, talk }];
+  const newTalkers = [...allTalkers, { name, age, id: allTalkers.length + 1, talk }];
   fs.writeFileSync('talker.json', JSON.stringify(newTalkers));
-  return response.status(HTTP_OK_STATUS).json({
-    message: 'Pessoa palestrante cadastrada com sucesso',
-  });
+  console.log({ name, age, id: allTalkers.length + 1, talk });
+  return response.status(HTTP_GOD_STATUS).json(
+    { name, age, id: allTalkers.length + 1, talk },
+  );
 });
 
 app.post('/login', validadeEmail, validadePassword, (_request, response) => {
