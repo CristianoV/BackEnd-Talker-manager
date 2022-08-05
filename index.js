@@ -30,6 +30,25 @@ app.get('/talker', (_request, response) => {
   return response.status(HTTP_OK_STATUS).json([]);
 });
 
+app.get('/talker/search', validadeToken, (_request, response) => {
+  const { q } = _request.query;
+  const allTalkers = talkers();
+
+  console.log(q);
+
+  if (!q) {
+    return response.status(HTTP_OK_STATUS).json(allTalkers);
+  }
+
+  const talkerFindName = allTalkers.filter((talkerId) => talkerId.name.includes(q));
+  console.log(talkerFindName);
+
+  if (talkerFindName) {
+    return response.status(HTTP_OK_STATUS).json(talkerFindName);
+  }
+  return response.status(HTTP_OK_STATUS).json([]);
+});
+
 app.get('/talker/:id', (_request, response) => {
   const { id } = _request.params;
   const allTalkers = talkers();
